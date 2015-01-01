@@ -1,0 +1,7 @@
+- @services.each do |service|
+  %div.service-box.ui-corner-all.custom-corners{:class => ('active' if service.active)}
+    %div.ui-bar.ui-bar-a
+      %h3= service.name
+    %div.ui-body.ui-body-a
+      %p
+        %input.flipswitch(data-role="flipswitch" type="checkbox"){:name => service.name, :checked => service.active}
