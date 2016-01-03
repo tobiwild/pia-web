@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+$LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..')) + '/lib'
+
+require 'piaweb'
+
+def exit_error(msg)
+  puts "ERROR: #{msg}"
+  puts 'USAGE: ./systemctl [start|stop] pia@[NAME].service'
+  exit(1)
+end
+
+exit_error 'wrong number of arguments' if ARGV.length != 2
+
+allowed_commands = %w( start stop )
+unless allowed_commands.include?(ARGV[0])
+  exit_error "allowed commands: #{allowed_commands.join(' ')}"
+end
+
+service_manager = PiaWeb::ServiceManager.new
+allowed_names = service_manager.services.map(&:systemd_name)
+
+unless allowed_names.include?(ARGV[1])
+  exit_error "allowed names: #{allowed_names.join(' ')}"
+end
+
+exec 'systemctl', *ARGV

@@ -17,6 +17,11 @@ module PiaWeb
       end
     end
 
+    def service(name)
+      services.find { |s| s.name == name } ||
+        raise(ServiceManagerException, "service with name #{name} not found")
+    end
+
     def active?(name)
       active_names.include?(name)
     end
@@ -44,13 +49,17 @@ module PiaWeb
     private
 
     def run_systemd(action, name)
-      service_name = "pia@#{name}.service"
-      run_command("sudo systemctl #{action} #{service_name.shellescape}")
+      name = service(name).systemd_name
+      run_command("sudo #{systemctl} #{action} #{name.shellescape}")
     end
 
     def run_command(command)
       return if system(command)
       raise ServiceManagerException, "#{command} was not successful"
+    end
+
+    def systemctl
+      ENV['SYSTEMCTL_PATH'] || '/usr/bin/systemctl'
     end
   end
 end

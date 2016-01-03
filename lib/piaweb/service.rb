@@ -1,6 +1,6 @@
 module PiaWeb
+  # Service
   class Service
-
     attr_reader :name
     attr_reader :active
 
@@ -9,5 +9,8 @@ module PiaWeb
       @active = active
     end
 
+    def systemd_name
+      "pia@#{@name}.service"
+    end
   end
 end
