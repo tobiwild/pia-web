@@ -4,24 +4,17 @@ module PiaWeb
   class ServiceManagerException < StandardError
   end
 
+  # Manages OpenVPN services
   class ServiceManager
-
     def initialize
       @vpn_dir = '/etc/openvpn/pia/'
     end
 
     def services
-      files = Dir.glob File.join(@vpn_dir, '*.ovpn')
-
-      result = []
-
-      files.each do |file|
-        if %r#([^/]+)\.ovpn$# === file
-          result << Service.new($1, active?($1))
-        end
+      Dir.glob(File.join(@vpn_dir, '*.ovpn')).sort.map do |file|
+        name = File.basename(file, '.ovpn')
+        Service.new(name, active?(name))
       end
-
-      result
     end
 
     def active?(name)
@@ -33,7 +26,7 @@ module PiaWeb
     end
 
     def active_names!
-      output = %x{systemctl -t service --state active list-units 'pia@*.service'}
+      output = `systemctl -t service --state active list-units 'pia@*.service'`
       output.scan(/(?<=pia@)[^.]+/)
     end
 
@@ -56,9 +49,8 @@ module PiaWeb
     end
 
     def run_command(command)
-      unless system(command)
-        raise ServiceManagerException.new(command + ' was not successful')
-      end
+      return if system(command)
+      raise ServiceManagerException, "#{command} was not successful"
     end
   end
 end

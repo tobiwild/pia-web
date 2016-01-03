@@ -1,11 +1,11 @@
-$: << File.expand_path(File.dirname(__FILE__)) + '/lib'
+$LOAD_PATH << File.expand_path(File.dirname(__FILE__)) + '/lib'
 
 require 'sinatra'
 require 'piaweb'
 require 'haml'
 require 'json'
 
-set :haml, :format => :html5
+set :haml, format: :html5
 
 get '/' do
   haml :index
@@ -32,11 +32,11 @@ def json_response
   content_type :json
   begin
     yield
-    { :result => 'success' }.to_json
+    { result: 'success' }.to_json
   rescue => e
     {
-      :result => 'error',
-      :message => e.message
+      result: 'error',
+      message: e.message
     }.to_json
   end
 end
